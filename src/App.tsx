@@ -1,26 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import { formatUserName } from "./utils";
+import "./style.css";
+import {getUsers} from "./usuario.service";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+interface UserType {
+  id: number;
+  user: string;
+  username: string;
 }
+
+const App = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [users, setUsers] = useState<UserType[]>([]);
+
+  useEffect(() => {
+    setLoading(true)
+    getUsers().then(data => {
+      setLoading(false)
+      setUsers(data)
+    });
+  }, [getUsers]);
+
+
+  return (
+    <>
+      <h2>Usuarios:</h2>
+      {loading && <div>Cargando usuarios...</div>}
+      {!loading && (
+        <ul className="card">
+          {users.map(({ id, user, username }: UserType) => (
+            <li key={id}>
+              <span>{user}</span> (<span>{formatUserName(username)}</span>)
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+};
 
 export default App;
